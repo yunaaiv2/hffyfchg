@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NahidXTom</title>
+<style>
+:root{--bg:#07070b;--surface:#101017;--card:#16161f;--input:#1c1c27;--ink:#f4f1ea;--ink2:#c9c6bf;--muted:#8a8895;--line:#262633;--gold:#f5b942;--gold2:#ff8a3d;--onGold:#1a1206;--glow:rgba(245,185,66,.18);--info:#6674e8;--ok:#10b981;--err:#ef4444}
+[data-theme="light"]{--bg:#f3f1ec;--surface:#fff;--card:#faf8f4;--input:#f0ede7;--ink:#17161c;--ink2:#3b3a45;--muted:#77757f;--line:#e2ded5;--gold:#d98a0b;--gold2:#e8590c;--onGold:#fff;--glow:rgba(217,138,11,.16);--ok:#059669;--err:#dc2626}
+*{margin:0;padding:0;box-sizing:border-box}
+*{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+input,select{user-select:text;-webkit-user-select:text}
+html{background:var(--bg)}
+body{font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;background:radial-gradient(900px 420px at 50% -120px,var(--glow),transparent),var(--bg);color:var(--ink);min-height:100vh;padding:18px 14px 48px}
+.i{width:1.15em;height:1.15em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;vertical-align:middle}
+.wrap{max-width:860px;margin:0 auto}
+[hidden]{display:none!important}
+
+/* header */
+header{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:12px}
+.mark{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;color:var(--onGold);background:linear-gradient(135deg,var(--gold),var(--gold2));box-shadow:0 8px 24px var(--glow);font-size:22px}
+.brand h1{font-size:20px;font-weight:800;letter-spacing:.5px;line-height:1.1}
+.brand span{font-size:12.5px;color:var(--muted)}
+.tools{display:flex;align-items:center;gap:10px}
+.theme{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:16px}
+.switch{position:relative;width:48px;height:26px;display:inline-block}
+.switch input{opacity:0;width:0;height:0}
+.slider{position:absolute;inset:0;background:var(--input);border:1px solid var(--line);border-radius:26px;cursor:pointer}
+.slider::before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));transition:transform .25s}
+.switch input:checked+.slider::before{transform:translateX(22px)}
+.switch input:focus-visible+.slider{outline:2px solid var(--gold);outline-offset:2px}
+
+/* social logos (YouTube / Telegram) */
+.soc{width:30px;height:30px;display:grid;place-items:center;flex-shrink:0}
+.soc svg{width:100%;height:100%;display:block}
+.soc-pill{display:inline-flex;align-items:center;gap:10px;padding:6px 16px 6px 6px;border-radius:40px;background:var(--surface);border:1px solid var(--line);color:var(--ink);font-weight:700;font-size:13.5px;text-decoration:none;transition:transform .2s,border-color .2s}
+.soc-pill:hover{transform:translateY(-2px);border-color:var(--gold)}
+.socials{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* rain background */
+#rain{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.wrap{position:relative;z-index:1}
+
+/* panels */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:20px;margin-bottom:18px;box-shadow:0 18px 50px rgba(0,0,0,.18)}
+.panel-title{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:700;margin-bottom:16px}
+.panel-title .badge{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;color:var(--gold);background:var(--glow);font-size:16px}
+.panel-title small{margin-left:auto;font-weight:600;color:var(--muted);font-size:12.5px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.uids{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+.field label{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--ink2);margin-bottom:6px}
+.field label .i{color:var(--muted)}
+.field input,.field select{width:100%;padding:12px 14px;border-radius:13px;border:1px solid var(--line);background:var(--input);color:var(--ink);font-size:15px;outline:none;transition:border-color .2s,box-shadow .2s}
+.field input:focus,.field select:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--glow)}
+.field select option{background:var(--surface);color:var(--ink)}
+
+/* search */
+.search-wrap{position:relative;margin-bottom:16px}
+.search-wrap .i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.search-wrap input{width:100%;padding:12px 14px 12px 42px;border-radius:13px;border:1px solid var(--line);background:var(--input);color:var(--ink);font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s}
+.search-wrap input:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--glow)}
+
+/* emotes */
+.emote-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+.emote-item{display:flex;flex-direction:column;align-items:center;gap:12px;padding:16px 12px 14px;background:var(--card);border:1px solid var(--line);border-radius:18px;transition:transform .2s,border-color .2s,box-shadow .2s}
+.emote-item:hover{transform:translateY(-3px);border-color:var(--gold);box-shadow:0 14px 30px var(--glow)}
+.emote-item img,.emote-ph{width:88px;height:88px;border-radius:14px;object-fit:contain;background:var(--input);border:1px solid var(--line)}
+.emote-ph{display:grid;place-items:center;color:var(--gold);font-size:28px}
+.emote-name{font-size:14px;font-weight:700;text-align:center;line-height:1.3}
+.send{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 12px;border:0;border-radius:30px;font-weight:800;font-size:14px;cursor:pointer;color:var(--onGold);background:linear-gradient(135deg,var(--gold),var(--gold2));transition:transform .15s,filter .15s}
+.send:hover{filter:brightness(1.08)}
+.send:active{transform:scale(.96)}
+.send:disabled{opacity:.55;cursor:wait}
+.send:focus-visible,.btn:focus-visible,.soc-pill:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+/* load more */
+.load-more{width:100%;margin-top:16px;padding:14px;border-radius:30px;border:1px solid var(--line);background:var(--card);color:var(--ink);font-weight:800;font-size:14px;cursor:pointer;transition:.2s}
+.load-more:hover{border-color:var(--gold);background:var(--input)}
+
+/* toast */
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);padding:13px 24px;border-radius:14px;font-size:14px;font-weight:600;z-index:99999;max-width:90%;text-align:center;color:#fff;box-shadow:0 10px 40px rgba(0,0,0,.4);animation:up .35s ease}
+.toast-info{background:var(--info)}.toast-success{background:var(--ok)}.toast-error{background:var(--err)}
+@keyframes up{from{opacity:0;transform:translateX(-50%) translateY(24px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* lock dialog */
+.lock{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(700px 380px at 50% 25%,var(--glow),transparent)}
+.lock-box{width:100%;max-width:390px;background:var(--surface);border:1px solid var(--line);border-radius:26px;padding:32px 24px 24px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+.lock-ico{width:68px;height:68px;margin:0 auto 18px;border-radius:50%;display:grid;place-items:center;font-size:30px;color:var(--gold);background:var(--glow);border:1px solid var(--gold);box-shadow:0 0 0 8px var(--glow)}
+.lock-box h2{font-size:22px;font-weight:800;margin-bottom:6px}
+.lock-box p.sub{font-size:14px;color:var(--muted);margin-bottom:20px}
+.pw{position:relative;margin-bottom:6px}
+.pw .i{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.pw input{width:100%;padding:14px 14px 14px 44px;border-radius:14px;border:1px solid var(--line);background:var(--input);color:var(--ink);font-size:16px;outline:none}
+.pw input:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--glow)}
+.pw input.bad{border-color:var(--err)}
+.lock-err{min-height:22px;font-size:13px;color:var(--err);text-align:left;padding:4px 4px 8px}
+.btn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:13px;border-radius:30px;font-weight:800;font-size:15px;cursor:pointer;text-decoration:none;border:0}
+.btn.gold{color:var(--onGold);background:linear-gradient(135deg,var(--gold),var(--gold2));box-shadow:0 10px 26px var(--glow)}
+.btn.gold:hover{filter:brightness(1.08)}
+.or{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:12.5px;margin:18px 0}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.btn.soc-btn{background:var(--card);color:var(--ink);border:1px solid var(--line);padding:9px 16px 9px 9px;justify-content:flex-start}
+.btn.soc-btn:hover{border-color:var(--gold)}
+.btn.soc-btn .t{flex:1;text-align:center;font-size:14px}
+.btn.soc-btn .soc{width:34px;height:34px}
+.lock-links{display:flex;flex-direction:column;gap:10px}
+
+
+/* ===== extra effects ===== */
+.aurora{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.aurora i{position:absolute;width:55vmax;height:55vmax;border-radius:50%;filter:blur(90px);opacity:.28;will-change:transform}
+.aurora i:nth-child(1){left:-15vmax;top:-20vmax;background:radial-gradient(circle,var(--gold2),transparent 65%);animation:drift1 22s ease-in-out infinite alternate}
+.aurora i:nth-child(2){right:-20vmax;top:10vh;background:radial-gradient(circle,var(--info),transparent 65%);animation:drift2 28s ease-in-out infinite alternate}
+.aurora i:nth-child(3){left:20vw;bottom:-30vmax;background:radial-gradient(circle,#a855f7,transparent 65%);opacity:.18;animation:drift1 32s ease-in-out infinite alternate-reverse}
+[data-theme="light"] .aurora i{opacity:.16}
+@keyframes drift1{to{transform:translate(12vw,10vh) scale(1.15)}}
+@keyframes drift2{to{transform:translate(-14vw,14vh) scale(1.2)}}
+.mist{position:fixed;left:0;right:0;bottom:0;height:34vh;z-index:0;pointer-events:none;background:linear-gradient(to top,rgba(120,150,220,.16),transparent)}
+[data-theme="light"] .mist{background:linear-gradient(to top,rgba(90,110,170,.14),transparent)}
+#flash{position:fixed;inset:0;z-index:0;pointer-events:none;background:#cfe0ff;opacity:0;mix-blend-mode:screen}
+
+.panel{background:color-mix(in srgb,var(--surface) 74%,transparent);-webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3);animation:rise .7s cubic-bezier(.2,.8,.2,1) both}
+.panel:nth-of-type(2){animation-delay:.08s}.panel:nth-of-type(3){animation-delay:.16s}.panel:nth-of-type(4){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(22px) scale(.98)}to{opacity:1;transform:none}}
+
+.mark{position:relative;background-size:200% 200%;background-image:linear-gradient(135deg,var(--gold),var(--gold2),#ff5e8a,var(--gold));animation:hue 6s ease infinite,pulse 3s ease-in-out infinite}
+@keyframes hue{50%{background-position:100% 100%}}
+@keyframes pulse{0%,100%{box-shadow:0 8px 24px var(--glow),0 0 0 0 rgba(245,185,66,.45)}50%{box-shadow:0 8px 28px var(--glow),0 0 0 10px rgba(245,185,66,0)}}
+.brand h1{background:linear-gradient(90deg,var(--ink),var(--gold),var(--gold2),var(--ink));background-size:250% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shine 5s linear infinite}
+@keyframes shine{to{background-position:-250% 0}}
+
+.emote-item{position:relative;overflow:hidden;animation:pop .55s cubic-bezier(.2,.9,.3,1.2) both}
+.emote-item:nth-child(5n+2){animation-delay:.04s}.emote-item:nth-child(5n+3){animation-delay:.08s}.emote-item:nth-child(5n+4){animation-delay:.12s}.emote-item:nth-child(5n){animation-delay:.16s}
+@keyframes pop{from{opacity:0;transform:translateY(16px) scale(.9)}to{opacity:1;transform:none}}
+.emote-item::before{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(180px 120px at 50% 0%,var(--glow),transparent);opacity:0;transition:opacity .3s;pointer-events:none}
+.emote-item:hover::before{opacity:1}
+.emote-item img{transition:transform .35s cubic-bezier(.2,.9,.3,1.3)}
+.emote-item:hover img{transform:scale(1.1) rotate(-3deg)}
+
+.send,.btn.gold{position:relative;overflow:hidden}
+.send::after,.btn.gold::after{content:"";position:absolute;top:0;left:-70%;width:45%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);transition:none}
+.send:hover::after,.btn.gold:hover::after{left:130%;transition:left .7s ease}
+.rip{position:absolute;border-radius:50%;background:rgba(255,255,255,.55);transform:scale(0);animation:rip .6s ease-out forwards;pointer-events:none}
+@keyframes rip{to{transform:scale(3.2);opacity:0}}
+
+.lock-box{background:color-mix(in srgb,var(--surface) 80%,transparent);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);animation:rise .8s cubic-bezier(.2,.8,.2,1) both,glowbox 4s ease-in-out infinite}
+@keyframes glowbox{0%,100%{box-shadow:0 30px 80px rgba(0,0,0,.35),0 0 0 1px var(--line)}50%{box-shadow:0 30px 90px rgba(0,0,0,.4),0 0 46px var(--glow),0 0 0 1px var(--gold)}}
+.lock-ico{animation:float 3.2s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-6px)}}
+.lock-box.shake{animation:shake .4s}
+@keyframes shake{20%,60%{transform:translateX(-9px)}40%,80%{transform:translateX(9px)}}
+.soc-pill,.btn.soc-btn{transition:transform .2s,border-color .2s,box-shadow .2s}
+.soc-pill:hover,.btn.soc-btn:hover{box-shadow:0 10px 26px var(--glow);transform:translateY(-2px)}
+.soc{transition:transform .3s}.soc-pill:hover .soc,.btn.soc-btn:hover .soc{transform:scale(1.15) rotate(-6deg)}
+.toast{backdrop-filter:blur(8px)}
+
+/* category tabs */
+.cats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.cat{flex:1 1 150px;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 14px;border-radius:30px;border:1px solid var(--line);background:color-mix(in srgb,var(--surface) 74%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);color:var(--ink2);font-weight:800;font-size:14px;cursor:pointer;transition:transform .2s,border-color .2s,background .2s,color .2s}
+.cat small{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--input);color:var(--muted)}
+.cat:hover{transform:translateY(-2px);border-color:var(--gold)}
+.cat.active{color:var(--onGold);border-color:transparent;background:linear-gradient(135deg,var(--gold),var(--gold2));box-shadow:0 10px 26px var(--glow)}
+.cat.active small{background:rgba(0,0,0,.18);color:inherit}
+.cat:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.emote-item img{display:block}
+.emote-ph{font-size:30px}
+.emote-ph.n{font-size:12px;font-weight:800;padding:6px;text-align:center;color:var(--muted)}
+
+@media(max-width:640px){.grid2{grid-template-columns:1fr}.uids{grid-template-columns:1fr 1fr}.panel{padding:16px}header{justify-content:center}.brand{width:100%;justify-content:center}.tools{width:100%;justify-content:center}}
+@media(max-width:380px){.uids{grid-template-columns:1fr}.emote-list{grid-template-columns:1fr 1fr;gap:10px}.emote-item img,.emote-ph{width:72px;height:72px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="mist" aria-hidden="true"></div>
+<div id="flash" aria-hidden="true"></div>
+<canvas id="rain" aria-hidden="true"></canvas>
+
+<!-- icon set -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10.5" rx="3"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/><circle cx="12" cy="15.7" r="1.2" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-server" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6.5" rx="2.5"/><rect x="3" y="13.5" width="18" height="6.5" rx="2.5"/><circle cx="7" cy="7.25" r=".9" fill="currentColor" stroke="none"/><circle cx="7" cy="16.75" r=".9" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17 14.2c2.6.2 4.5 2 4.5 5"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M21.5 2.5 10.5 13.5"/><path d="M21.5 2.5l-7 19-4-8.5-8.5-4z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 2.5l2.6 6.9 6.9 2.6-6.9 2.6L12 21.5l-2.6-6.9L2.5 12l6.9-2.6z"/></symbol>
+  <symbol id="s-yt" viewBox="0 0 24 24"><path fill="#ff0000" d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1c.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8z"/><path fill="#fff" d="M9.6 15.6V8.4l6.2 3.6z"/></symbol>
+  <symbol id="s-tg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#229ed9"/><path fill="#fff" d="M5.4 11.9c3.5-1.5 5.8-2.5 7-3 3.3-1.4 4-1.6 4.4-1.6.1 0 .3 0 .5.1.1.1.2.2.2.3 0 .1 0 .3 0 .5-.2 1.9-.9 6.4-1.3 8.5-.2.9-.5 1.2-.8 1.2-.7.1-1.2-.5-1.9-.9-1-.7-1.6-1.1-2.6-1.8-1.2-.8-.4-1.2.3-1.9.2-.2 3.2-2.9 3.3-3.2 0 0 0-.2-.1-.2s-.2 0-.2 0c-.1 0-1.8 1.1-5.1 3.3-.5.3-.9.5-1.3.5-.4 0-1.3-.2-1.9-.4-.8-.2-1.3-.4-1.3-.8.1-.2.4-.4.8-.6z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></symbol>
+</svg>
+
+<!-- password dialog -->
+<div class="lock" id="lock" role="dialog" aria-modal="true" aria-labelledby="lock-title">
+  <div class="lock-box">
+    <div class="lock-ico"><svg class="i"><use href="#i-lock"/></svg></div>
+    <h2 id="lock-title">Enter password</h2>
+    <p class="sub">This site is password protected.</p>
+    <div class="pw">
+      <svg class="i"><use href="#i-lock"/></svg>
+      <input type="password" id="pw" placeholder="Password" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Password">
+    </div>
+    <div class="lock-err" id="lock-err" aria-live="polite"></div>
+    <button class="btn gold" id="unlock">Unlock <svg class="i"><use href="#i-arrow"/></svg></button>
+    <div class="or">Subscribe My Channel And Join My TG Channel</div>
+    <div class="lock-links">
+      <a class="btn soc-btn" href="https://youtube.com/@nahidh4cksisback?si=l1bFBuK_qljO4D0c" target="_blank" rel="noopener noreferrer">
+        <span class="soc"><svg><use href="#s-yt"/></svg></span>
+        <span class="t">Official YouTube Channel</span>
+      </a>
+      <a class="btn soc-btn" href="https://t.me/nahidh4cks" target="_blank" rel="noopener noreferrer">
+        <span class="soc"><svg><use href="#s-tg"/></svg></span>
+        <span class="t">Official Telegram Channel</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- app -->
+<div class="wrap" id="app" hidden>
+  <header>
+    <div class="brand">
+      <div class="mark"><svg class="i"><use href="#i-spark"/></svg></div>
+      <div><h1>NAHID X TOM</h1><span>EMOTE BOT</span></div>
+    </div>
+    <div class="tools">
+      <div class="socials">
+        <a class="soc-pill" href="https://youtube.com/@nahidh4cksisback?si=l1bFBuK_qljO4D0c" target="_blank" rel="noopener noreferrer"><span class="soc"><svg><use href="#s-yt"/></svg></span>YouTube</a>
+        <a class="soc-pill" href="https://t.me/nahidh4cks" target="_blank" rel="noopener noreferrer"><span class="soc"><svg><use href="#s-tg"/></svg></span>Telegram</a>
+      </div>
+      <div class="theme">
+        <svg class="i"><use href="#i-sun"/></svg>
+        <label class="switch"><input type="checkbox" id="theme-toggle" aria-label="Toggle light theme"><span class="slider"></span></label>
+        <svg class="i"><use href="#i-moon"/></svg>
+      </div>
+    </div>
+  </header>
+
+  <section class="panel">
+    <div class="panel-title"><span class="badge"><svg class="i"><use href="#i-users"/></svg></span>Match details</div>
+    <div class="grid2">
+      <div class="field">
+        <label for="server"><svg class="i"><use href="#i-server"/></svg> Server</label>
+        <select id="server">
+          <option value="india">India Server</option>
+          <option value="bangladesh">Bangladesh Server</option>
+          <option value="pakistan">Pakistan Server</option>
+          <option value="indonesia">Indonesia Server</option>
+          <option value="brazil">Brazil Server</option>
+          <option value="taiwan">Taiwan Server</option>
+          <option value="vietnam">Vietnam Server</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="team-code"><svg class="i"><use href="#i-users"/></svg> Team Code</label>
+        <input type="text" id="team-code" placeholder="Enter team code" inputmode="numeric">
+      </div>
+    </div>
+    <div class="uids">
+      <div class="field"><label for="uid1"><svg class="i"><use href="#i-user"/></svg> UID 1</label><input type="text" id="uid1" placeholder="Required" inputmode="numeric"></div>
+      <div class="field"><label for="uid2"><svg class="i"><use href="#i-user"/></svg> UID 2</label><input type="text" id="uid2" placeholder="Optional" inputmode="numeric"></div>
+      <div class="field"><label for="uid3"><svg class="i"><use href="#i-user"/></svg> UID 3</label><input type="text" id="uid3" placeholder="Optional" inputmode="numeric"></div>
+      <div class="field"><label for="uid4"><svg class="i"><use href="#i-user"/></svg> UID 4</label><input type="text" id="uid4" placeholder="Optional" inputmode="numeric"></div>
+      <div class="field"><label for="uid5"><svg class="i"><use href="#i-user"/></svg> UID 5</label><input type="text" id="uid5" placeholder="Optional" inputmode="numeric"></div>
+      <div class="field"><label for="uid6"><svg class="i"><use href="#i-user"/></svg> UID 6</label><input type="text" id="uid6" placeholder="Optional" inputmode="numeric"></div>
+    </div>
+  </section>
+
+  <!-- category tabs -->
+  <nav class="cats" id="cats" aria-label="Emote categories">
+    <button class="cat active" data-cat="ob55" type="button"><svg class="i"><use href="#i-spark"/></svg>OB55NewEmote<small id="cnt-ob55">12</small></button>
+    <button class="cat" data-cat="normal" type="button"><svg class="i"><use href="#i-spark"/></svg>Normal<small id="cnt-normal">0</small></button>
+    <button class="cat" data-cat="evo" type="button"><svg class="i"><use href="#i-spark"/></svg>Evo Emote<small id="cnt-evo">0</small></button>
+  </nav>
+
+  <section class="panel">
+    <div class="panel-title"><span class="badge"><svg class="i"><use href="#i-spark"/></svg></span><span id="cat-title">OB55NewEmote</span><small id="all-count">Loading...</small></div>
+    <div class="search-wrap">
+      <svg class="i"><use href="#i-search"/></svg>
+      <input type="text" id="emote-search" placeholder="Search emotes by name or ID..." autocomplete="off">
+    </div>
+    <div class="emote-list" id="emote-list-all"></div>
+    <button class="load-more" id="load-more" hidden>Load More Emotes</button>
+  </section>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ===== Anti-inspection =====
+  document.addEventListener('keydown', function (e) {
+    var k = (e.key || '').toLowerCase();
+    if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (k === 'i' || k === 'j' || k === 'c')) || (e.ctrlKey && (k === 'u' || k === 's' || k === 'p'))) {
+      e.preventDefault(); e.stopPropagation(); return false;
+    }
+  }, true);
+  document.addEventListener('contextmenu', function (e) { e.preventDefault(); }, true);
+  document.addEventListener('dragstart', function (e) { e.preventDefault(); }, true);
+
+  // ===== Password gate =====
+  var PASSWORD = '6767';
+  var lock = document.getElementById('lock');
+  var app = document.getElementById('app');
+  var pw = document.getElementById('pw');
+  var lockErr = document.getElementById('lock-err');
+  function openApp() { lock.hidden = true; app.hidden = false; }
+  try { if (sessionStorage.getItem('nahidpapa_unlocked') === '1') openApp(); } catch (e) {}
+  function tryUnlock() {
+    if (pw.value.trim().toLowerCase() === PASSWORD) {
+      try { sessionStorage.setItem('nahidpapa_unlocked', '1'); } catch (e) {}
+      openApp();
+    } else {
+      pw.classList.add('bad');
+      lockErr.textContent = 'Wrong password. Try again.';
+      pw.select();
+    }
+  }
+  document.getElementById('unlock').addEventListener('click', tryUnlock);
+  pw.addEventListener('keydown', function (e) { if (e.key === 'Enter') tryUnlock(); });
+  pw.addEventListener('input', function () { pw.classList.remove('bad'); lockErr.textContent = ''; });
+
+  // ===== API =====
+  var API_ENDPOINT = 'https://ffemote.pro/api/join';
+
+  // ===== Toast =====
+  function showToast(msg, type) {
+    var old = document.querySelector('.toast'); if (old) old.remove();
+    var t = document.createElement('div');
+    t.className = 'toast toast-' + (type || 'info');
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(function () { t.style.opacity = '0'; setTimeout(function () { t.remove(); }, 400); }, 4000);
+  }
+
+  // ===== Theme =====
+  var toggle = document.getElementById('theme-toggle');
+  var saved = 'dark';
+  try { saved = localStorage.getItem('tompapa_theme') || 'dark'; } catch (e) {}
+  document.documentElement.setAttribute('data-theme', saved);
+  toggle.checked = saved === 'light';
+  toggle.addEventListener('change', function () {
+    var th = this.checked ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', th);
+    try { localStorage.setItem('tompapa_theme', th); } catch (e) {}
+  });
+
+  // ===== OB55 Emotes =====
+  var ob55Emotes = [
+    { id: '909055001', name: 'OB55 Emote 1',  img: 'https://cdn.jsdelivr.net/gh/ShahGCreator/icon@main/PNG/909055001.png' },
+    { id: '909055002', name: 'OB55 Emote 2',  img: 'https://cdn.jsdelivr.net/gh/ShahGCreator/icon@main/PNG/909055002.png' },
+    { id: '909055003', name: 'OB55 Emote 3',  img: 'https://cdn.jsdelivr.net/gh/ShahGCreator/icon@main/PNG/909055003.png' },
+    { id: '909055004', name: 'OB55 Emote 4',  img: 'https://cdn.jsdelivr.net/gh/ShahGCreator/icon@main/PNG/909055004.png' },
+    { id: '909055005', name: 'OB55 Emote 5',  img: 'https://cdn.jsdelivr.net/gh/ShahGCreator/icon@main/PNG/909055005.png' },
+    { id: '909055006', name: 'OB55 Emote 6',  img: 'https://cdn.jsdelivr.net/gh/ShahGCreator/icon@main/PNG/909055006.png' },
+    { id: '909055007', name: 'OB55 Emote 7',  img: 'https://cdn.jsdelivr.net/gh/ShahGCreator/icon@main/PNG/909055007.png' },
+    { id: '909055008', name: 'OB55 Emote 8',  img: 'https://cdn.jsdelivr.net/gh/ShahGCreator/icon@main/PNG/909055008.png' },
+    { id: '909055009', name: 'OB55 Emote 9',  img: 'https://cdn.jsdelivr.net/gh/ShahGCreator/icon@main/PNG/909055009.png' },
+    { id: '909055010', name: 'OB55 Emote 10', img: 'https://cdn.jsdelivr.net/gh/ShahGCreator/icon@main/PNG/909055010.png' },
+    { id: '909055011', name: 'OB55 Emote 11', img: 'https://cdn.jsdelivr.net/gh/ShahGCreator/icon@main/PNG/909055011.png' },
+    { id: '909055012', name: 'OB55 Emote 12', img: 'https://cdn.jsdelivr.net/gh/ShahGCreator/icon@main/PNG/909055012.png' },
+    { id: '909055013', name: 'OB55 Emote 13', img: 'https://cdn.jsdelivr.net/gh/ShahGCreator/icon@main/PNG/909055013.png' }
+  ];
+
+  // ===== Full Emote List =====
+  var allEmotes = [
+    { id: "909000075", name: "Cobra Max" },
+    { id: "909000063", name: "Ak Max" },
+    { id: "909035007", name: "Shotgun Max" },
+    { id: "909000068", name: "Scar Max" },
+    { id: "909000085", name: "XM8 Max" },
+    { id: "909000081", name: "M10 Max" },
+    { id: "909000090", name: "Famasa Max" },
+    { id: "909000098", name: "UMP Max" },
+    { id: "909040010", name: "New M40 Max" },
+    { id: "909045001", name: "Parafal Max" },
+    { id: "909042008", name: "WD Picker Max" },
+    { id: "909049012", name: "Open Fire" },
+    { id: "909042007", name: "Gloo Sculpture" },
+    { id: "909000002", name: "LOL" },
+    { id: "909000003", name: "Provoke" },
+    { id: "909000010", name: "Flowers of Love" },
+    { id: "909000014", name: "FFWC Throne" },
+    { id: "909000032", name: "Selfie" },
+    { id: "909000034", name: "Pirate's Flag" },
+    { id: "909000036", name: "Top DJ" },
+    { id: "909000038", name: "Power of Money" },
+    { id: "909000039", name: "Eat My Dust" },
+    { id: "909000041", name: "Kongfu" },
+    { id: "909000045", name: "I Heart You" },
+    { id: "909000046", name: "Tea Time" },
+    { id: "909000052", name: "Doggie" },
+    { id: "909000055", name: "I'm Rich!" },
+    { id: "909000056", name: "Make It Rain" },
+    { id: "909000057", name: "Dust Off" },
+    { id: "909000058", name: "Captain Booyah" },
+    { id: "909000060", name: "BOOYAH!" },
+    { id: "909000061", name: "Bhangra" },
+    { id: "909000062", name: "Piece of Cake" },
+    { id: "909000064", name: "I'm Saitama!" },
+    { id: "909000065", name: "The Victor" },
+    { id: "909000066", name: "Sii!" },
+    { id: "909000067", name: "Obliteration" },
+    { id: "909000069", name: "Top Scorer" },
+    { id: "909000070", name: "Triple Kicks" },
+    { id: "909000071", name: "Cobra Dance" },
+    { id: "909000072", name: "Predator Pulse" },
+    { id: "909000073", name: "Ground Punch" },
+    { id: "909000074", name: "The Biker" },
+    { id: "909000076", name: "One-Finger Pushup" },
+    { id: "909000077", name: "Stage Time" },
+    { id: "909000078", name: "Booyah! Balloon" },
+    { id: "909000079", name: "More Practice" },
+    { id: "909000080", name: "FFWS 2021" },
+    { id: "909000086", name: "Mythos Four" },
+    { id: "909000087", name: "Champion Grab" },
+    { id: "909000088", name: "Win and Chill" },
+    { id: "909000089", name: "Hadouken" },
+    { id: "909000091", name: "Big Smash" },
+    { id: "909000093", name: "All In Control" },
+    { id: "909000094", name: "Debugging" },
+    { id: "909000095", name: "Waggor Wave" },
+    { id: "909000096", name: "Crazy Guitar" },
+    { id: "909000121", name: "Dribble King" },
+    { id: "909000123", name: "Mind it!" },
+    { id: "909000124", name: "Golden Combo" },
+    { id: "909000125", name: "Sick Moves" },
+    { id: "909000128", name: "Ruler's Flag" },
+    { id: "909000129", name: "Money Throw" },
+    { id: "909000130", name: "Endless Bullets" },
+    { id: "909000133", name: "Fire Slam" },
+    { id: "909000134", name: "Heartbroken" },
+    { id: "909000135", name: "Rock Paper Scissors" },
+    { id: "909000136", name: "Shattered Reality" },
+    { id: "909000137", name: "Halo of Music" },
+    { id: "909000138", name: "Burnt BBQ" },
+    { id: "909000139", name: "Switching Steps" },
+    { id: "909000140", name: "Creed Slay" },
+    { id: "909000141", name: "Leap of Fail" },
+    { id: "909000143", name: "Helicopter Shot" },
+    { id: "909000144", name: "Kungfu Tigers" },
+    { id: "909000145", name: "Possessed Warrior" },
+    { id: "909033001", name: "Fireborn" },
+    { id: "909033002", name: "Golden Feather" },
+    { id: "909033004", name: "Drop Kick" },
+    { id: "909033005", name: "Sit Down!" },
+    { id: "909033006", name: "BOOYAH Sparks" },
+    { id: "909033007", name: "The FFWS Dance" },
+    { id: "909033008", name: "Easy Peasy" },
+    { id: "909033009", name: "Winner Throw" },
+    { id: "909033010", name: "Weight of Victory" },
+    { id: "909034001", name: "Chronicle of Sword" },
+    { id: "909034002", name: "The Collapse" },
+    { id: "909034003", name: "Flaming Groove" },
+    { id: "909034004", name: "Energetic" },
+    { id: "909034005", name: "Ridicule" },
+    { id: "909034006", name: "Tease Waggor" },
+    { id: "909034007", name: "Great Conductor" },
+    { id: "909034008", name: "Fake Death" },
+    { id: "909034009", name: "Twerk" },
+    { id: "909034010", name: "BR Heroic Emote" },
+    { id: "909034011", name: "BR Master Emote" },
+    { id: "909034012", name: "CS Heroic Emote" },
+    { id: "909034013", name: "CS Master Emote" },
+    { id: "909034014", name: "Yes, I do" },
+    { id: "909035001", name: "Free Money!" },
+    { id: "909035005", name: "Victorious Eagle" },
+    { id: "909035006", name: "Flying Saucer" },
+    { id: "909035008", name: "Bobble Dance" },
+    { id: "909035009", name: "Weight Training" },
+    { id: "909035010", name: "Beautiful Love" },
+    { id: "909035011", name: "Groove Moves" },
+    { id: "909035012", name: "Howler's Rage" },
+    { id: "909035013", name: "Louder Please" },
+    { id: "909035014", name: "Ninja Stand" },
+    { id: "909035015", name: "Creator In Action" },
+    { id: "909036001", name: "Ghost Float" },
+    { id: "909036002", name: "Shiba Surf" },
+    { id: "909036003", name: "Waiter Walk" },
+    { id: "909036004", name: "Graffiti Cameraman" },
+    { id: "909036005", name: "Agile Boxer" },
+    { id: "909036006", name: "Sunbathing" },
+    { id: "909036008", name: "Skateboard Swag" },
+    { id: "909036009", name: "Phantom Tamer" },
+    { id: "909036010", name: "The Signal" },
+    { id: "909036011", name: "Eternal Descent" },
+    { id: "909036012", name: "Swaggy Dance" },
+    { id: "909036014", name: "Admire" },
+    { id: "909037001", name: "Reindeer Float" },
+    { id: "909037002", name: "Bamboo Dance" },
+    { id: "909037003", name: "Dance of Constellation" },
+    { id: "909037004", name: "Trophy Grab" },
+    { id: "909037005", name: "Starry Hands" },
+    { id: "909037006", name: "Yum" },
+    { id: "909037007", name: "Happy Dancing" },
+    { id: "909037008", name: "Juggle" },
+    { id: "909037009", name: "Neon Sign" },
+    { id: "909037010", name: "Beast Tease" },
+    { id: "909037011", name: "Drachen Tear" },
+    { id: "909037012", name: "Clap Dance" },
+    { id: "909038001", name: "The Influencer" },
+    { id: "909038003", name: "Techno Blast" },
+    { id: "909038004", name: "Be My Valentine" },
+    { id: "909038005", name: "Angry Walk" },
+    { id: "909038006", name: "Make Some Noise" },
+    { id: "909038008", name: "Croco Hooray" },
+    { id: "909038009", name: "Scorpio Spin" },
+    { id: "909038010", name: "Cinder Summon" },
+    { id: "909038011", name: "Shall We Dance?" },
+    { id: "909038012", name: "Achiever Flip" },
+    { id: "909038013", name: "Spin Master" },
+    { id: "909039001", name: "Festival Celebration" },
+    { id: "909039002", name: "Artistic Dance" },
+    { id: "909039003", name: "Forward Backward" },
+    { id: "909039004", name: "Scorpion Friend" },
+    { id: "909039005", name: "Aching Power" },
+    { id: "909039006", name: "Earthly Force" },
+    { id: "909039007", name: "Grenade Magic" },
+    { id: "909039008", name: "Oh Yeah!" },
+    { id: "909039009", name: "Grace On Wheels" },
+    { id: "909039010", name: "Flex" },
+    { id: "909039011", name: "Crimson Doom" },
+    { id: "909039012", name: "Fire Beast Tamer" },
+    { id: "909039013", name: "Crimson Tunes" },
+    { id: "909039014", name: "Swaggy V-Steps" },
+    { id: "909040001", name: "Chromatic Finish" },
+    { id: "909040002", name: "Smash the Feather" },
+    { id: "909040003", name: "Sonorous Steps" },
+    { id: "909040004", name: "Fishing for Wisdom" },
+    { id: "909040005", name: "Chromatic Pop Dance" },
+    { id: "909040006", name: "Chroma Twist" },
+    { id: "909040008", name: "Birth of Justice" },
+    { id: "909040009", name: "Spider-Sense" },
+    { id: "909040011", name: "Play With Thunderbolt" },
+    { id: "909040012", name: "6th Anniversary" },
+    { id: "909040013", name: "Wisdom Swing" },
+    { id: "909040014", name: "Helicopter Shot" },
+    { id: "909041005", name: "Diz My Popblaster" },
+    { id: "909041006", name: "Dance Puppet Dance!" },
+    { id: "909041007", name: "High Knees" },
+    { id: "909041008", name: "Bony Fumes" },
+    { id: "909041009", name: "Feel the Electricity" },
+    { id: "909041010", name: "Whac-A-Cotton" },
+    { id: "909041011", name: "Honorable Mention" },
+    { id: "909041012", name: "BR Grandmaster" },
+    { id: "909041013", name: "CS Grandmaster" },
+    { id: "909041014", name: "Monster Clubbing" },
+    { id: "909041015", name: "Basudara Dance" },
+    { id: "909042001", name: "Stir-Fry Frostfire" },
+    { id: "909042002", name: "Money Rain" },
+    { id: "909042003", name: "Frostfire's Calling" },
+    { id: "909042004", name: "Stomping Foot" },
+    { id: "909042005", name: "This Way" },
+    { id: "909042006", name: "Excellent Service" },
+    { id: "909042009", name: "Celebration Schuss" },
+    { id: "909042011", name: "Dawn Voyage" },
+    { id: "909042012", name: "Lamborghini Ride" },
+    { id: "909042013", name: "Hello Frostfire" },
+    { id: "909042016", name: "Hand Grooves" },
+    { id: "909042017", name: "Free Fire Toiletman" },
+    { id: "909042018", name: "Kemusan" },
+    { id: "909043001", name: "Ribbit Rider" },
+    { id: "909043002", name: "Inner Self Mastery" },
+    { id: "909043003", name: "Emperor's Treasure" },
+    { id: "909043004", name: "Why So Chaos?" },
+    { id: "909043005", name: "Huge Feast" },
+    { id: "909043006", name: "Color Burst" },
+    { id: "909043007", name: "Dragon Swipe" },
+    { id: "909043008", name: "Samba" },
+    { id: "909043009", name: "Speed Summon" },
+    { id: "909043010", name: "What a Match" },
+    { id: "909043013", name: "What a Pair" },
+    { id: "909044001", name: "Byte Mounting" },
+    { id: "909044002", name: "The Unicyclist" },
+    { id: "909044003", name: "Basket Rafting" },
+    { id: "909044004", name: "Happy Lamb" },
+    { id: "909044005", name: "Paradox Enlightenment" },
+    { id: "909044006", name: "Harmonious Paradox" },
+    { id: "909044007", name: "Raise Your Thumb!" },
+    { id: "909044015", name: "Final Paradox" },
+    { id: "909044016", name: "Honk Up!" },
+    { id: "909045002", name: "Spring Rocker" },
+    { id: "909045003", name: "Giddy Up!" },
+    { id: "909045004", name: "The Goosy Dance" },
+    { id: "909045005", name: "Captain Victor" },
+    { id: "909045010", name: "A Flower Salute" },
+    { id: "909045011", name: "Little Foxy Run" },
+    { id: "909045012", name: "Mr. Waggor's Seesaw" },
+    { id: "909045015", name: "Floating Meditation" },
+    { id: "909045016", name: "Naatu Naatu" },
+    { id: "909045017", name: "Champion's Walk" },
+    { id: "909046001", name: "Aura Boarder" },
+    { id: "909046002", name: "Who's the Champ!" },
+    { id: "909046003", name: "Controlled Combustion" },
+    { id: "909046004", name: "Cheers to Victory!" },
+    { id: "909046005", name: "Shoe Shining" },
+    { id: "909046006", name: "Gunspinning" },
+    { id: "909046007", name: "Crowd Pleaser" },
+    { id: "909046008", name: "No Sweat" },
+    { id: "909046009", name: "Magma Quake" },
+    { id: "909046010", name: "Max Firepower" },
+    { id: "909046011", name: "Can't Touch This" },
+    { id: "909046012", name: "Firestarter" },
+    { id: "909046013", name: "FFWS Flag Flair" },
+    { id: "909046014", name: "Beat Drop" },
+    { id: "909046015", name: "Spatial Awareness" },
+    { id: "909046016", name: "Nagi's Trapping" },
+    { id: "909046017", name: "Soaring Up" },
+    { id: "909047001", name: "I Won't Bow Down" },
+    { id: "909047002", name: "Aurora Iridescence" },
+    { id: "909047003", name: "Couch For Two" },
+    { id: "909047004", name: "Flutter Dash" },
+    { id: "909047005", name: "Slippery Throne" }
+  ];
+
+  // Image mirrors for the same icon repo: if one CDN is blocked/slow, the next is tried
+  var IMG_HOSTS = [
+    'https://cdn.jsdelivr.net/gh/ShahGCreator/icon@main/PNG/',
+    'https://fastly.jsdelivr.net/gh/ShahGCreator/icon@main/PNG/',
+    'https://gcore.jsdelivr.net/gh/ShahGCreator/icon@main/PNG/',
+    'https://raw.githubusercontent.com/ShahGCreator/icon/main/PNG/',
+    'https://cdn.statically.io/gh/ShahGCreator/icon/main/PNG/',
+    'https://rawcdn.githack.com/ShahGCreator/icon/main/PNG/'
+  ];
+  var imgFails = 0, imgWarned = false;
+  function emoteImg(id, n) { return IMG_HOSTS[n || 0] + id + '.png'; }
+
+  // ===== Categories (ids/names/types follow ffemote.pro) =====
+  var NAME_FIX = {
+    '909000075':'Cobra Rising','909033001':'M4A1 Max','909033002':'MP5 Max','909035012':'AN94 Max',
+    '909037011':'Fist Max','909038010':'Thompson Max','909038012':'G18 Max','909039011':'New M10 Max',
+    '909041005':'GROZA Max','909042007':'100 Gloo Sculpture',
+    '909055001':'Alien X Power','909055002':'Turkey Balloon','909055003':'Lion Dancing','909055004':'Crawl Out',
+    '909055006':'Cosmic Vortex','909055007':'Cosmic Powershot','909055008':'Tornado Push','909055009':'Flame Attack!',
+    '909055010':'Silent Sting','909055011':'Strange Power','909055012':'Beast Pound','909055013':'Firefig Showcase'
+  };
+  var EVO_IDS = ['909054004','909000063','909000068','909000075','909000081','909000085','909000090','909033001',
+    '909033002','909035007','909035012','909037011','909038010','909038012','909039011','909040010','909041005',
+    '909042008','909045001','909049010','909000098','909051003','909055007'];
+  var EVO_EXTRA = { '909054004':'Aug Max', '909049010':'P90 Max', '909051003':'M60 Max' };
+
+  var byId = {};
+  allEmotes.concat(ob55Emotes).forEach(function (em) {
+    if (NAME_FIX[em.id]) em.name = NAME_FIX[em.id];
+    byId[em.id] = em;
+  });
+  Object.keys(EVO_EXTRA).forEach(function (id) { if (!byId[id]) byId[id] = { id: id, name: EVO_EXTRA[id] }; });
+
+  var isEvo = {};
+  EVO_IDS.forEach(function (id) { isEvo[id] = 1; });
+  var evoEmotes = EVO_IDS.map(function (id) { return byId[id]; }).filter(Boolean);
+  var normalEmotes = allEmotes.filter(function (em) { return !isEvo[em.id]; });
+  ob55Emotes = ob55Emotes.filter(function (em) { return !isEvo[em.id]; });
+  var CATS = { ob55: ob55Emotes, normal: normalEmotes, evo: evoEmotes };
+  var CAT_NAMES = { ob55: 'OB55NewEmote', normal: 'Normal', evo: 'Evo Emote' };
+  var curCat = 'ob55';
+
+  var teamCode = document.getElementById('team-code');
+  var serverSel = document.getElementById('server');
+  var uids = [1, 2, 3, 4, 5, 6].map(function (n) { return document.getElementById('uid' + n); });
+  var listAll = document.getElementById('emote-list-all');
+  var searchInput = document.getElementById('emote-search');
+  var loadMoreBtn = document.getElementById('load-more');
+  var allCountEl = document.getElementById('all-count');
+  var SEND_ICON = '<svg class="i"><use href="#i-send"/></svg> Send';
+
+
+  // Build API URL
+  function buildUrl(emoteId) {
+    var url = API_ENDPOINT + '?';
+    url += 'tc=' + encodeURIComponent(teamCode.value.trim());
+    url += '&emote_id=' + encodeURIComponent(emoteId);
+    url += '&server=' + encodeURIComponent(serverSel.value);
+    url += '&uid1=' + encodeURIComponent(uids[0].value.trim());
+    for (var n = 2; n <= 6; n++) {
+      var v = uids[n - 1].value.trim();
+      if (v) url += '&uid' + n + '=' + encodeURIComponent(v);
+    }
+    return url;
+  }
+
+  // Send function
+  function send(btn, emoteId) {
+    if (!teamCode.value.trim() || !uids[0].value.trim()) {
+      showToast('⚠️ Please fill in Team Code and UID 1', 'error');
+      return;
+    }
+    var url = buildUrl(emoteId);
+    btn.disabled = true;
+    showToast('🔄 Sending emote...', 'info');
+
+    fetch(url, { method: 'GET', headers: { 'Accept': 'application/json' } })
+      .then(function (response) {
+        return response.text().then(function (text) {
+          var data = null, isJson = false;
+          var ct = response.headers.get('content-type') || '';
+          if (ct.indexOf('application/json') !== -1) {
+            try { data = JSON.parse(text); isJson = true; } catch (e) {}
+          }
+          if (!response.ok) {
+            var errMsg = '❌ Error ' + response.status;
+            if (response.status === 404) errMsg += ' - API endpoint not found.';
+            else errMsg += ': ' + (isJson ? JSON.stringify(data) : text.slice(0, 120));
+            throw new Error(errMsg);
+          }
+          return { data: data, isJson: isJson, text: text };
+        });
+      })
+      .then(function (result) {
+        if (result.isJson) {
+          if (result.data.status === 'success') {
+            showToast('✅ ' + (result.data.message || 'Emote sent successfully!'), 'success');
+          } else {
+            showToast('⚠️ ' + (result.data.message || 'Something went wrong'), 'error');
+          }
+        } else {
+          showToast('✅ Emote sent!', 'success');
+        }
+      })
+      .catch(function (err) {
+        showToast(err.message || '❌ Network error. Please try again.', 'error');
+      })
+      .finally(function () {
+        btn.disabled = false;
+      });
+  }
+
+  // Build a single emote card (no ID shown)
+  function makeCard(em) {
+    var item = document.createElement('div');
+    item.className = 'emote-item';
+    var img = document.createElement('img');
+    var tryN = 0;
+    img.alt = em.name;
+    img.decoding = 'async';
+    img.referrerPolicy = 'no-referrer';
+    img.src = em.img || emoteImg(em.id, 0);
+    img.onerror = function () {
+      tryN++;
+      if (tryN < IMG_HOSTS.length) { img.src = emoteImg(em.id, tryN); return; }
+      img.onerror = null;
+      img.style.display = 'none';
+      var ph = document.createElement('div');
+      ph.className = 'emote-ph';
+      ph.innerHTML = '<svg class="i"><use href="#i-spark"/></svg>';
+      item.insertBefore(ph, item.firstChild);
+      imgFails++;
+      if (imgFails === 6 && !imgWarned) {
+        imgWarned = true;
+        showToast('⚠️ ছবি লোড হচ্ছে না। আপনার নেটওয়ার্ক/ব্রাউজারে jsDelivr ব্লক থাকতে পারে (VPN/অন্য DNS দিয়ে দেখুন)। Send আগের মতোই কাজ করবে।', 'error');
+      }
+    };
+    var name = document.createElement('div');
+    name.className = 'emote-name';
+    name.textContent = em.name;
+    var btn = document.createElement('button');
+    btn.className = 'send';
+    btn.innerHTML = SEND_ICON;
+    btn.addEventListener('click', function () { send(btn, em.id); });
+    item.appendChild(img);
+    item.appendChild(name);
+    item.appendChild(btn);
+    return item;
+  }
+
+  // Pagination + category + search
+  var PAGE_SIZE = 30;
+  var shown = 0;
+  var filtered = CATS[curCat].slice();
+  var catTitle = document.getElementById('cat-title');
+
+  document.getElementById('cnt-ob55').textContent = ob55Emotes.length;
+  document.getElementById('cnt-normal').textContent = normalEmotes.length;
+  document.getElementById('cnt-evo').textContent = evoEmotes.length;
+
+  function applyFilter() {
+    var q = searchInput.value.trim().toLowerCase();
+    var src = CATS[curCat];
+    filtered = !q ? src.slice() : src.filter(function (em) {
+      return em.name.toLowerCase().indexOf(q) !== -1 || em.id.indexOf(q) !== -1;
+    });
+    renderPage(true);
+  }
+
+  function renderPage(reset) {
+    if (reset) { listAll.innerHTML = ''; shown = 0; }
+    var next = filtered.slice(shown, shown + PAGE_SIZE);
+    next.forEach(function (em) { listAll.appendChild(makeCard(em)); });
+    shown += next.length;
+    loadMoreBtn.hidden = shown >= filtered.length;
+    allCountEl.textContent = filtered.length + ' emotes';
+    catTitle.textContent = CAT_NAMES[curCat];
+  }
+
+  document.getElementById('cats').addEventListener('click', function (e) {
+    var b = e.target.closest('.cat');
+    if (!b) return;
+    curCat = b.getAttribute('data-cat');
+    Array.prototype.forEach.call(document.querySelectorAll('.cat'), function (x) {
+      x.classList.toggle('active', x === b);
+    });
+    applyFilter();
+  });
+
+  searchInput.addEventListener('input', applyFilter);
+  loadMoreBtn.addEventListener('click', function () { renderPage(false); });
+
+  renderPage(true);
+})();
+</script>
+<script>
+/* rain + lightning + ripple */
+(function(){
+  var c=document.getElementById('rain'),x=c.getContext('2d'),fl=document.getElementById('flash');
+  var W,H,drops=[],splash=[],bolt=null,flashA=0,nextBolt=0,t=0;
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function mk(r){
+    var z=Math.random();
+    return{x:Math.random()*(W+160)-40,y:r?Math.random()*H:-40,l:10+z*22,v:8+z*16,a:.12+z*.42,w:.5+z*1,z:z};
+  }
+  function size(){
+    var d=Math.min(window.devicePixelRatio||1,2);
+    W=innerWidth;H=innerHeight;c.width=W*d;c.height=H*d;x.setTransform(d,0,0,d,0,0);
+    var n=Math.min(260,Math.floor(W/4.5));drops=[];
+    for(var i=0;i<n;i++)drops.push(mk(true));
+  }
+  function light(){return document.documentElement.getAttribute('data-theme')==='light'}
+  function col(a){return light()?'rgba(60,85,150,'+a+')':'rgba(175,205,255,'+a+')'}
+  function makeBolt(){
+    var px=W*(.15+Math.random()*.7),py=0,pts=[[px,py]];
+    while(py<H*(.45+Math.random()*.35)){py+=16+Math.random()*34;px+=(Math.random()-.5)*70;pts.push([px,py]);}
+    var br=[],k=2+Math.floor(Math.random()*3);
+    for(var i=0;i<k;i++){
+      var o=pts[2+Math.floor(Math.random()*(pts.length-3))],bx=o[0],by=o[1],bp=[[bx,by]];
+      var dir=Math.random()<.5?-1:1;
+      for(var j=0;j<4+Math.random()*4;j++){bx+=dir*(8+Math.random()*26);by+=10+Math.random()*26;bp.push([bx,by]);}
+      br.push(bp);
+    }
+    return{main:pts,br:br,life:1};
+  }
+  function strike(){bolt=makeBolt();flashA=light()?.25:.5;nextBolt=t+4+Math.random()*7;}
+  function path(pts){x.beginPath();x.moveTo(pts[0][0],pts[0][1]);for(var i=1;i<pts.length;i++)x.lineTo(pts[i][0],pts[i][1]);x.stroke();}
+  function frame(){
+    t+=1/60;
+    x.clearRect(0,0,W,H);
+    x.lineCap='round';x.lineJoin='round';
+    var sway=Math.sin(t*.6)*.06;
+    for(var i=0;i<drops.length;i++){
+      var d=drops[i],dx=.16+sway;
+      x.strokeStyle=col(d.a);x.lineWidth=d.w;
+      x.beginPath();x.moveTo(d.x,d.y);x.lineTo(d.x-d.l*dx,d.y+d.l);x.stroke();
+      d.y+=d.v;d.x-=d.v*dx;
+      if(d.y>H){
+        if(d.z>.45&&splash.length<70){
+          splash.push({x:d.x,y:H-3,r:1,a:d.a,p:[1,2,3].map(function(){return{vx:(Math.random()-.5)*3,vy:-(1+Math.random()*2.5),x:0,y:0}})});
+        }
+        drops[i]=mk(false);
+      }
+    }
+    for(var j=splash.length-1;j>=0;j--){
+      var s=splash[j],f=1-s.r/14;
+      x.strokeStyle=col(s.a*f);x.lineWidth=1;
+      x.beginPath();x.ellipse(s.x,s.y,s.r*2,s.r*.55,0,0,6.283);x.stroke();
+      x.fillStyle=col(s.a*f*1.4);
+      for(var k=0;k<s.p.length;k++){var q=s.p[k];q.x+=q.vx;q.y+=q.vy;q.vy+=.28;x.fillRect(s.x+q.x,s.y+q.y,1.4,1.4);}
+      s.r+=.55;if(s.r>14)splash.splice(j,1);
+    }
+    if(!bolt&&t>nextBolt)strike();
+    if(bolt){
+      x.save();x.globalAlpha=Math.max(bolt.life,0);
+      x.shadowColor=light()?'rgba(90,110,255,.9)':'rgba(170,200,255,1)';x.shadowBlur=24;
+      x.strokeStyle='rgba(255,255,255,.95)';x.lineWidth=2.4;path(bolt.main);
+      x.lineWidth=1.2;bolt.br.forEach(path);
+      x.restore();
+      bolt.life-=.045;
+      if(bolt.life<.55&&bolt.life>.4&&!bolt.again){bolt.again=1;bolt.life=1;flashA=.35;}
+      if(bolt.life<=0)bolt=null;
+    }
+    flashA*=.9;fl.style.opacity=flashA<.01?0:flashA;
+    requestAnimationFrame(frame);
+  }
+  addEventListener('resize',size);
+  size();
+  nextBolt=3+Math.random()*3;
+  if(!reduce)requestAnimationFrame(frame);
+
+  /* click ripple */
+  document.addEventListener('pointerdown',function(e){
+    var b=e.target.closest&&e.target.closest('.send,.btn.gold');
+    if(!b)return;
+    var r=b.getBoundingClientRect(),m=Math.max(r.width,r.height)/2,el=document.createElement('span');
+    el.className='rip';el.style.cssText='width:'+m+'px;height:'+m+'px;left:'+(e.clientX-r.left-m/2)+'px;top:'+(e.clientY-r.top-m/2)+'px';
+    b.appendChild(el);setTimeout(function(){el.remove()},650);
+  });
+  /* shake lock box on wrong password */
+  var err=document.getElementById('lock-err');
+  if(err&&window.MutationObserver)new MutationObserver(function(){
+    if(err.textContent){var lb=document.querySelector('.lock-box');lb.classList.remove('shake');void lb.offsetWidth;lb.classList.add('shake');}
+  }).observe(err,{childList:true,characterData:true,subtree:true});
+})();
+</script>
+</body>
+</html>
